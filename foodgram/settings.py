@@ -6,7 +6,7 @@ root = environ.Path(__file__) - 2  # get root of the project
 env = environ.Env()  # set default values and casting
 environ.Env.read_env(os.path.join(root(), '.env'))  # reading .env file
 
-BASE_DIR = os.path.dirname(root())
+BASE_DIR = root()
 
 DEBUG = env.bool('DEBUG', default=False)
 ALLOWED_HOSTS = ['*']
@@ -15,7 +15,7 @@ SECRET_KEY = env.str('SECRET_KEY')
 SITE_ROOT = root()
 
 DATABASES = {'default': env.db('DATABASE_URL',
-                               default='sqlite:///dev-sqlite.db.sqlite3')}
+                               default='sqlite:///db.sqlite3')}
 
 # DATABASES = {
 #     'default': {
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'users',
+    'recipes',
 ]
 
 MIDDLEWARE = [
