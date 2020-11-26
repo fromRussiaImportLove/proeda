@@ -4,3 +4,4 @@ django-filter==2.3.0
 django-cors-headers==3.5.0
 django-environ==0.4.5
 pytils==0.3
+Pillow==8.0.1
