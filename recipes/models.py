@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 
 from pytils.translit import slugify
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill, Adjust
 
 User = settings.AUTH_USER_MODEL
 
@@ -15,10 +17,16 @@ class Tag(models.TextChoices):
 class Unit(models.Model):
     name = models.CharField(max_length=16)
 
+    def __str__(self):
+        return self.name
+
 
 class Ingredient(models.Model):
     name = models.CharField(max_length=128)
-    units = models.ForeignKey(Unit, on_delete=models.PROTECT)
+    unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f'{self.name}, {self.unit}'
 
 
 class Recipe(models.Model):
@@ -30,6 +38,24 @@ class Recipe(models.Model):
     )
     description = models.TextField(verbose_name='Описание')
     image = models.ImageField(verbose_name='Изображение', upload_to='recipes/', null=True, blank=True)
+    image_max_size = ImageSpecField(
+        [Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(480, 480)],
+        source='image',
+        format='JPEG',
+        options={'quality': 90}
+    )
+    image_med_size = ImageSpecField(
+        [Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(363, 240)],
+        source='image',
+        format='JPEG',
+        options={'quality': 90}
+    )
+    image_small_size = ImageSpecField(
+        [Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(90, 90)],
+        source='image',
+        format='JPEG',
+        options={'quality': 90}
+    )
     tag = models.CharField(max_length=128, choices=Tag.choices)
     cooking_time = models.IntegerField(verbose_name='Время готовки')
     pub_date = models.DateTimeField(
@@ -52,7 +78,7 @@ class Recipe(models.Model):
         return super().save(*args, **kwargs)
 
 
-class IngredientsInRecipes(models.Model):
+class IngredientsInRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -244,8 +270,9 @@ class BasketManager(models.Manager):
         """ Метод возвращает queryset из ингридиентов и количества"""
         # basked_items = self.filter(user=self.instance)
         basked_recipes = self.all().values('recipe_id')
-        ingredients = IngredientsInRecipes.objects.filter(
-            recipe__in=basked_recipes).annotate(amount=models.Sum('amount'))
+        ingredients = IngredientsInRecipe.objects.filter(
+            recipe__in=basked_recipes).values(
+            'ingredient__name').annotate(total=models.Sum('amount'))
         return ingredients
 
 
