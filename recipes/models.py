@@ -1,17 +1,12 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from pytils.translit import slugify
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill, Adjust
 
 User = settings.AUTH_USER_MODEL
-
-
-class Tag(models.TextChoices):
-    BREAKFAST = 'Breakfast'
-    LUNCH = 'Lunch'
-    DINNER = 'Dinner'
 
 
 class Unit(models.Model):
@@ -56,7 +51,6 @@ class Recipe(models.Model):
         format='JPEG',
         options={'quality': 90}
     )
-    tag = models.CharField(max_length=128, choices=Tag.choices)
     cooking_time = models.IntegerField(verbose_name='Время готовки')
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
@@ -77,6 +71,10 @@ class Recipe(models.Model):
             self.slug = slugify(f'{self.pk}-{self.name}')
         return super().save(*args, **kwargs)
 
+    # def clean(self):
+    #     if not TagRecipe.objects.filter(recipe=self).exists():
+    #         raise ValidationError('Tag has not been added')
+
 
 class IngredientsInRecipe(models.Model):
     recipe = models.ForeignKey(
@@ -90,6 +88,27 @@ class IngredientsInRecipe(models.Model):
         related_name='recipes',
     )
     amount = models.IntegerField(verbose_name='Количество')
+
+
+class TagRecipe(models.Model):
+    recipe = models.OneToOneField(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='tags',
+    )
+    breakfast = models.BooleanField('Breakfast')
+    lunch = models.BooleanField('Lunch')
+    dinner = models.BooleanField('Dinner')
+
+    def __str__(self):
+        return (f'Tags {self.recipe.name[:15]}: b_{self.breakfast} '
+                f'l_{self.lunch} d_{self.dinner}')
+
+    def clean(self):
+        tags = (value for field, value in self.__dict__.items()
+                if field not in ('id', 'recipe_id', '_state'))
+        if not any(tags):
+            raise ValidationError('At least one tag must True')
 
 
 class FollowManager(models.Manager):
@@ -175,8 +194,8 @@ class Follow(models.Model):
     objects = FollowManager()
 
     class Meta:
-        models.UniqueConstraint(fields=['user', 'author'],
-                                name='unique_follow')
+        constraints = [models.UniqueConstraint(fields=['user', 'author'],
+                                               name='unique_follow')]
 
     def __str__(self):
         return f'{self.user.username} follow to {self.author.username}'
@@ -230,8 +249,8 @@ class Favorite(models.Model):
     objects = FavoriteManager()
 
     class Meta:
-        models.UniqueConstraint(fields=['user', 'recipe'],
-                                name='unique_follow')
+        constraints = [models.UniqueConstraint(fields=['user', 'recipe'],
+                                               name='unique_favorite')]
 
     def __str__(self):
         return f'{self.user.username} like {self.recipe.name}'
@@ -291,8 +310,8 @@ class Basket(models.Model):
     objects = BasketManager()
 
     class Meta:
-        models.UniqueConstraint(fields=['user', 'recipe'],
-                                name='unique_follow')
+        constraints = [models.UniqueConstraint(fields=['user', 'recipe'],
+                                               name='unique_basket')]
 
     def __str__(self):
         return f'{self.user.username} want {self.recipe.name}'
