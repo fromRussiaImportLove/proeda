@@ -40,7 +40,7 @@ class Recipe(models.Model):
         options={'quality': 90}
     )
     image_med_size = ImageSpecField(
-        [Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(363, 240)],
+        [Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(363, 363)],
         source='image',
         format='JPEG',
         options={'quality': 90}
@@ -109,6 +109,11 @@ class TagRecipe(models.Model):
                 if field not in ('id', 'recipe_id', '_state'))
         if not any(tags):
             raise ValidationError('At least one tag must True')
+
+    def true_list(self):
+        tags = [field for field, value in self.__dict__.items()
+                if field not in ('id', 'recipe_id', '_state') and value]
+        return tags
 
 
 class FollowManager(models.Manager):
