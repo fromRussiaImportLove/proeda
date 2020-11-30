@@ -1,0 +1,18 @@
+.logo {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    width: 48px;
+    height: 48px;
+    background-image: url("../images/dish.svg");
+}
+
+.logo-text{
+    font-style: normal;
+    font-weight: 500;
+    font-size: 36px;
+    line-height: 20px;
+    color: inherit;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+}

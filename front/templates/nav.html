@@ -1,14 +1,23 @@
 {% if user.is_authenticated %}
-    <div class="row">
-        <ul class="nav nav-tabs">
-            <li class="nav-item">
-                <a class="nav-link {% if index %}active{% endif %}" href="{% url 'index' %}">Все авторы</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if follow %}active{% endif %}" href="{%url 'index' %}">Избранные авторы</a>
-            </li>
-        </ul>
-    </div>
+<header class="header">
+    <nav class="nav">
+        <div class="nav__container container">
+            <ul class="nav__items list"><div class="logo-text">пр<span class="logo"></span>éда</div></ul>
+            <ul class="nav__items list">
+                <li class="nav__item nav__item_active"><a href="#" class="nav__link link">Рецепты</a></li>
+                <li class="nav__item"><a href="#" class="nav__link link">Мои подписки</a></li>
+                <li class="nav__item"><a href="#" class="nav__link link">Создать рецепт</a></li>
+                <li class="nav__item"><a href="#" class="nav__link link">Избранное</a></li>
+                <li class="nav__item"><a href="#" class="nav__link link">Список покупок</a><span class="badge badge_style_blue nav__badge" id="counter">4</span></li>
+
+            </ul>
+            <ul class="nav__items list">
+                <li class="nav__item"><a href="#" class="nav__link link">Изменить пароль</a></li>
+                <li class="nav__item"><a href="#" class="nav__link link">Выход</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
 {% else %}
     <header class="header">
     <nav class="nav">

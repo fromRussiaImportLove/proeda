@@ -45,7 +45,7 @@ class IngredientsInRecipeAdmin(admin.ModelAdmin):
     list_display_links = ('recipe', 'ingredient')
     list_display = ('recipe', 'ingredient', 'amount')
     search_fields = ('recipe', 'ingredient')
-    raw_id_fields = ('ingredient',)
+    autocomplete_fields = ('ingredient',)
 
 
 @admin.register(Follow, Favorite, Basket)
