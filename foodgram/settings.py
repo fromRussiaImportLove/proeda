@@ -24,6 +24,8 @@ STATIC_URL = env.str('STATIC_URL', default='/static/')
 STATICFILES_DIRS = [('recipes', './front/'),]
 TEMPLATES_DIR = root('front/templates')
 
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = 'index'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
