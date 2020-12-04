@@ -17,13 +17,14 @@ class Api {
       })
   }
   addPurchases (id) {
-    return fetch(`/purchases`, {
+    return fetch(`${this.apiUrl}/purchases/`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
       },
       body: JSON.stringify({
-        id: id
+        recipe: id
       })
     })
       .then( e => {
