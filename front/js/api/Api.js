@@ -50,7 +50,7 @@ class Api {
       })
   }
   addSubscriptions(id) {
-    return fetch(`${this.apiUrl}/subscriptions`, {
+    return fetch(`${this.apiUrl}/subscriptions/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ class Api {
 
       },
       body: JSON.stringify({
-        id: id
+        author_id: id
       })
     })
       .then( e => {
@@ -85,7 +85,7 @@ class Api {
       })
   }
   addFavorites (id)  {
-    return fetch(`${this.apiUrl}/favorites`, {
+    return fetch(`${this.apiUrl}/favorites/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ class Api {
 
       },
       body: JSON.stringify({
-        id: id
+        recipe: id
       })
     })
         .then( e => {

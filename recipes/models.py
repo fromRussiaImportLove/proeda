@@ -89,6 +89,9 @@ class IngredientsInRecipe(models.Model):
     )
     amount = models.IntegerField(verbose_name='Количество')
 
+    def __str__(self):
+        return f'{self.ingredient.name} - {self.amount} {self.ingredient.unit}'
+
 
 class TagRecipe(models.Model):
     recipe = models.OneToOneField(
@@ -109,6 +112,12 @@ class TagRecipe(models.Model):
                 if field not in ('id', 'recipe_id', '_state'))
         if not any(tags):
             raise ValidationError('At least one tag must True')
+
+    @classmethod
+    def validate_tag(cls, tag):
+        tags = (field.name for field in cls._meta._get_fields()
+                if field.name not in ('id', 'recipe'))
+        return tag in tags
 
     def true_list(self):
         tags = [field for field, value in self.__dict__.items()
@@ -212,6 +221,15 @@ class FavoriteManager(models.Manager):
             return super().filter(recipe=recipe, user=user).exists()
         return False
 
+    def get_my_recipes(self):
+        """
+        :return: Возвращает список рецептов пользователя,
+        добавленные в избранное
+        """
+        recipes = [r.recipe.id for r in self.instance.favorite_recipes.all()]
+        queryset = Recipe.objects.filter(id__in=recipes)
+        return queryset
+
     def append(self, recipe):
         """
         Метод добавления рецепта в избранное
@@ -267,6 +285,15 @@ class BasketManager(models.Manager):
             return super().filter(recipe=recipe, user=user).exists()
         return False
 
+    def get_my_recipes(self):
+        """
+        :return: Возвращает список рецептов пользователя,
+        добавленных в корзину
+        """
+        recipes = [r.recipe.id for r in self.instance.basket.all()]
+        queryset = Recipe.objects.filter(id__in=recipes)
+        return queryset
+
     def append(self, recipe):
         """
         Метод добавления рецепта в корзину
@@ -296,8 +323,18 @@ class BasketManager(models.Manager):
         basked_recipes = self.all().values('recipe_id')
         ingredients = IngredientsInRecipe.objects.filter(
             recipe__in=basked_recipes).values(
-            'ingredient__name').annotate(total=models.Sum('amount'))
-        return ingredients
+            'ingredient__name', 'ingredient__unit__name').annotate(
+            total=models.Sum('amount'))
+        shoplist = 'Ваш список покупок от сервиса про`Еда\n\n'
+        for num, item in enumerate(ingredients, 1):
+            shoplist += '\t' + str(num) + '. '
+            shoplist += item['ingredient__name'] + ': '
+            shoplist += str(item['total']) + ' '
+            shoplist += item['ingredient__unit__name'] + '\t\t[  ]' + '\n'
+
+        shoplist += '\n\tПриятного аппетита!'
+        shoplist += '\n\thttp://proeda.lukojo.com'
+        return shoplist
 
 
 class Basket(models.Model):

@@ -15,5 +15,5 @@ def is_favorite(user, recipe):
 
 
 @register.filter
-def is_follow(user, recipe):
-    return Follow.objects.is_follow(recipe, user)
+def is_follow(user, author):
+    return Follow.objects.is_follow(author, user)
