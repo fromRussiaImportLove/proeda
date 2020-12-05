@@ -1,3 +1,4 @@
+{% load recipes_filters %}
 <div class="card" data-id="{{ recipe.id }}">
                 <a href="#" class="link" target="_blank"><img src="{{ recipe.image_med_size.url }}" alt="{{ recipe.name }}" class="card__image"></a>
                 <div class="card__body">
@@ -19,6 +20,20 @@
                     </div>
                 </div>
                 <div class="card__footer">
-                    <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
+                    {% if user|is_basked:recipe %}
+                    <button class="button button_style_light-blue-outline" name="purchases">
+                        <span class="icon-check button__icon"></span>Убрать из покупок</button>
+                    {% else %}
+                    <button class="button button_style_light-blue" name="purchases" data-out>
+                        <span class="icon-plus button__icon"></span>Добавить в покупки</button>
+                    {% endif %}
+                    {% if user and user|is_favorite:recipe %}
+                        <button class="button button_style_none" name="favorites">
+                            <span class="icon-favorite_active"></span></button>
+                    {% elif not user %}
+                    {% else %}
+                        <button class="button button_style_none" name="favorites" data-out>
+                            <span class="icon-favorite"></span></button>
+                    {% endif %}
                 </div>
             </div>

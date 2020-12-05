@@ -35,10 +35,11 @@ class Api {
       })
   }
   removePurchases (id){
-    return fetch(`/purchases/${id}`, {
+    return fetch(`${this.apiUrl}/purchases/${id}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
       }
     })
       .then( e => {
@@ -49,10 +50,12 @@ class Api {
       })
   }
   addSubscriptions(id) {
-    return fetch(`/subscriptions`, {
+    return fetch(`${this.apiUrl}/subscriptions`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+                  'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+
       },
       body: JSON.stringify({
         id: id
@@ -66,10 +69,12 @@ class Api {
       })
   }
   removeSubscriptions (id) {
-    return fetch(`/subscriptions/${id}`, {
+    return fetch(`${this.apiUrl}/subscriptions/${id}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+                  'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+
       }
     })
       .then( e => {
@@ -80,10 +85,12 @@ class Api {
       })
   }
   addFavorites (id)  {
-    return fetch(`/favorites`, {
+    return fetch(`${this.apiUrl}/favorites`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+                  'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+
       },
       body: JSON.stringify({
         id: id
@@ -97,10 +104,12 @@ class Api {
         })
   }
   removeFavorites (id) {
-    return fetch(`/favorites/${id}`, {
+    return fetch(`${this.apiUrl}/favorites/${id}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+                  'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+
       }
     })
         .then( e => {
@@ -111,9 +120,11 @@ class Api {
         })
   }
     getIngredients  (text)  {
-        return fetch(`/ingredients?query=${text}`, {
+        return fetch(`${this.apiUrl}/ingredients?query=${text}`, {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                        'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+
             }
         })
             .then( e => {
