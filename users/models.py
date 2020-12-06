@@ -15,3 +15,9 @@ class CustomUser(AbstractUser):
         default=Roles.USER,
         choices=Roles.choices,
     )
+
+    def fullname(self):
+        if self.first_name or self.last_name:
+            return f'{self.first_name} {self.last_name}'.strip()
+        else:
+            return f'user: {self.username}'

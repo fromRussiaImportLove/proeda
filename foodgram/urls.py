@@ -16,12 +16,12 @@ urlpatterns = [
     path('api/', include('api.urls')),
 ]
 
-# urlpatterns = [
-#     path('about-author/', views.flatpage,
-#          {'url': '/about-author/'}, name='about-author'),
-#     path('about-spec/', views.flatpage,
-#          {'url': '/about-spec/'}, name='about-spec'),
-# ]
+urlpatterns += [
+    path('about-author/', views.flatpage,
+         {'url': '/about-author/'}, name='about-author'),
+    path('about-spec/', views.flatpage,
+         {'url': '/about-spec/'}, name='about-spec'),
+]
 
 if settings.DEBUG:
     import debug_toolbar

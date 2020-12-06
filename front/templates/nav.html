@@ -7,7 +7,7 @@
             <ul class="nav__items list">
                 <li id="index" class="nav__item"><a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
                 {% if user.is_authenticated %}
-                <li id="subscriptions" class="nav__item"><a href="#" class="nav__link link">Мои подписки</a></li>
+                <li id="subscriptions" class="nav__item"><a href="{% url 'subscriptions' %}" class="nav__link link">Мои подписки</a></li>
                 <li id="new" class="nav__item"><a href="#" class="nav__link link">Создать рецепт</a></li>
                 <li id="favorites" class="nav__item"><a href="{% url 'favorites' %}" class="nav__link link">Избранное</a></li>
                 <li id="cart" class="nav__item"><a href="{% url 'basket' %}" class="nav__link link">Список покупок</a>

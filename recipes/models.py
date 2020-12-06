@@ -1,12 +1,13 @@
 from django.db import models
-from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 from pytils.translit import slugify
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill, Adjust
 
-User = settings.AUTH_USER_MODEL
+
+User = get_user_model()
 
 
 class Unit(models.Model):
@@ -22,6 +23,11 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return f'{self.name}, {self.unit}'
+
+
+class RecipeManager(models.Manager):
+    def get_three(self):
+        return self.order_by('-pub_date')[:3]
 
 
 class Recipe(models.Model):
@@ -62,6 +68,8 @@ class Recipe(models.Model):
         blank=True,
         unique=True,
     )
+
+    objects = RecipeManager()
 
     def __str__(self):
         return self.name
@@ -133,13 +141,20 @@ class FollowManager(models.Manager):
 
     def recipes(self):
         """
-        :return: Возвращает список рецептов пользователя,
+        :return: Возвращает список всех рецептов всех авторов,
+        на которых подписан пользователь,
         отсортированный от новых к старым
         """
         authors = self.all().values('author_id')
         recipes_list = Recipe.objects.filter(
             author__in=authors).order_by('-pub_date')
         return recipes_list
+
+    def get_my_authors(self):
+        """:return: Возвращает список любимых авторов"""
+        authors = self.all().values('author_id')
+        queryset = User.objects.filter(id__in=authors)
+        return queryset
 
     def check_related_name(self, user_obj):
         """
@@ -325,6 +340,7 @@ class BasketManager(models.Manager):
             recipe__in=basked_recipes).values(
             'ingredient__name', 'ingredient__unit__name').annotate(
             total=models.Sum('amount'))
+
         shoplist = 'Ваш список покупок от сервиса про`Еда\n\n'
         for num, item in enumerate(ingredients, 1):
             shoplist += '\t' + str(num) + '. '

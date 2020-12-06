@@ -36,7 +36,9 @@
                 <div class="single-card__items single-card__items_column">
                     <p class="single-card__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
                     <ul class="single-card__items">
-                        <li class="single-card__item"><p class="single-card__text"><span class="icon-user"></span> {{ recipe.author }}</p></li>
+                        <li class="single-card__item"><p class="single-card__text"><span class="icon-user"></span>
+                            <a href="{% url 'profile' recipe.author.username %}" style="color: black">{{ recipe.author.fullname }}</a>
+                        </p></li>
                         <li class="single-card__item">  <a style="margin-left: 2.5em" href="#" class="single-card__text">Редактировать рецепт</a></li>
                     </ul>
                 </div>
@@ -48,7 +50,15 @@
                     <li class="single-card__item"><button class="button button_style_blue" name="purchases" data-out>
                         <span class="icon-plus"></span> Добавить в покупки</button></li>
                     {% endif %}
-                    <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></li>
+                    {% if user|is_follow:recipe.author %}
+                    <li class="single-card__item">
+                        <button class="button button_style_light-blue button_size_subscribe" name="subscribe">Отписаться</button>
+                    </li>
+                    {% else %}
+                    <li class="single-card__item">
+                        <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button>
+                    </li>
+                    {% endif %}
                 </ul>
                 <div class="single-card__section">
                     <h3 class="single-card__section-title">Ингридиенты:</h3>

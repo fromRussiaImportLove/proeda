@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -7,6 +8,9 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.decorators.cache import cache_page
 
 from recipes.models import Recipe, TagRecipe
+
+
+User = get_user_model()
 
 
 def get_paginator_context(objects_list, page_slice, request) -> dict:
@@ -29,6 +33,21 @@ def index(request, tag=None):
     return render(request, 'recipes/index.html', context)
 
 
+def profile(request, author_username, tag=None):
+    author = get_object_or_404(User, username=author_username)
+    if tag := request.GET.get('tag'):
+        if not TagRecipe.validate_tag(tag):
+            raise Http404('unknow tag')
+        recipes_list = Recipe.objects.filter(**{
+            'tags__' + tag: True,
+            'author': author,
+        })
+    else:
+        recipes_list = Recipe.objects.filter(author=author)
+    context = get_paginator_context(recipes_list, 9, request)
+    return render(request, 'recipes/index.html', context)
+
+
 @login_required
 def favorites(request, tag=None):
     user = request.user
@@ -41,6 +60,14 @@ def favorites(request, tag=None):
         recipes_list = user.favorite_recipes.get_my_recipes()
     context = get_paginator_context(recipes_list, 9, request)
     return render(request, 'recipes/index.html', context)
+
+
+@login_required
+def subscriptions(request):
+    user = request.user
+    authors = user.favorite_authors.get_my_authors()
+    context = get_paginator_context(authors, 3, request)
+    return render(request, 'recipes/subscriptions.html', context)
 
 
 @login_required

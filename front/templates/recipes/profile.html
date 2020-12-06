@@ -4,14 +4,18 @@
 {% block content %}
 
     <div class="main__header">
-            <h1 class="main__title">Рецепты</h1>
+            <h1 class="main__title">{{ author.fullname }}</h1>
             {% include "recipes/tags.html" %}
-        </div>
-        <div class="card-list">
+
+    </div>
+    <div class="author-subscribe" data-author="{{ author.id }}">
+            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></p>
+    </div>
+    <div class="card-list">
             {% for recipe in page %}
                 {% include "recipes/recipe_card.html" with recipe=recipe %}
             {% endfor %}
-        </div>
+    </div>
 
         {% if page.has_other_pages %}
         {% include "paginator.html" with items=page paginator=paginator %}
@@ -19,20 +23,22 @@
 
 {% endblock %}
 {% block include_js %}
-    {% csrf_token %}
-    <script src="{% static 'recipes/js/components/MainCards.js' %}"></script>
+{% csrf_token %}
+<script src="{% static 'recipes/js/components/MainCards.js' %}"></script>
 
 <script src="{% static 'recipes/js/components/Purchases.js' %}"></script>
 
 <script src="{% static 'recipes/js/config/config.js' %}"></script>
-<script src="{% static 'recipes/js/components/CardList.js' %}"></script>
 <script src="{% static 'recipes/js/components/Header.js' %}"></script>
 
 <script src="{% static 'recipes/js/api/Api.js' %}"></script>
 {% if user.is_authenticated %}
 <script src="{% static 'recipes/js/components/Favorites.js' %}"></script>
-<script src="{% static 'recipes/indexAuth.js' %}"></script>
+<script src="{% static 'recipes/js/components/Subscribe.js' %}"></script>
+
 {% else %}
-<script src="{% static 'recipes/indexNotAuth.js' %}"></script>
+
 {% endif %}
+<script src="{% static 'recipes/js/components/Subscribe.js' %}"></script>
+<script src="{% static 'recipes/AuthorRecipe.js' %}"></script>
 {% endblock %}
