@@ -1,13 +1,14 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
-from django.contrib.auth import get_user_model
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-# from api.permissions import IsOwnerOrReadOnly
-from api.serializers import *
-from recipes.models import Recipe, Ingredient
+from api.serializers import (
+    BaksetSerializer, FavoriteSerializer,
+    FollowSerializer, IngredientSerializer, UserSerializer, )
+from recipes.models import Ingredient, Recipe
 
 
 User = get_user_model()
@@ -55,7 +56,8 @@ def api_favorites(request, recipe_id=None):
     if request.method == 'GET':
         if recipe_id:
             user = request.user
-            queryset = get_object_or_404(user.favorite_recipes, recipe__id=recipe_id)
+            queryset = get_object_or_404(
+                user.favorite_recipes, recipe__id=recipe_id)
             serializer = FavoriteSerializer(queryset)
             return Response(serializer.data)
 
@@ -84,7 +86,8 @@ def api_follow(request, author_id=None):
     if request.method == 'GET':
         if author_id:
             user = request.user
-            queryset = get_object_or_404(user.favorite_authors, recipe__id=author_id)
+            queryset = get_object_or_404(
+                user.favorite_authors, recipe__id=author_id)
             serializer = FollowSerializer(queryset)
             return Response(serializer.data)
 
@@ -109,7 +112,7 @@ def api_follow(request, author_id=None):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, ])
-def api_ingredients(request, query=None):
+def api_ingredients(request):
     if request.method == 'GET':
         if query := request.GET.get('query'):
             if len(query) > 2:
@@ -123,4 +126,3 @@ def api_ingredients(request, query=None):
             ingredients = Ingredient.objects.all()
         serializer = IngredientSerializer(ingredients, many=True)
         return Response(serializer.data)
-

@@ -1,11 +1,9 @@
-from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-
-from pytils.translit import slugify
+from django.db import models
 from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToFill, Adjust
-
+from imagekit.processors import Adjust, ResizeToFill
+from pytils.translit import slugify
 
 User = get_user_model()
 
@@ -38,7 +36,7 @@ class Recipe(models.Model):
         related_name='recipes',
     )
     description = models.TextField(verbose_name='Описание')
-    image = models.ImageField(verbose_name='Изображение', upload_to='recipes/', null=True, blank=True)
+    image = models.ImageField(verbose_name='Картинка', upload_to='recipes/')
     image_max_size = ImageSpecField(
         [Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(480, 480)],
         source='image',
@@ -70,6 +68,9 @@ class Recipe(models.Model):
     )
 
     objects = RecipeManager()
+
+    class Meta:
+        ordering = ['-pub_date']
 
     def __str__(self):
         return self.name
@@ -337,7 +338,7 @@ class BasketManager(models.Manager):
 
     def shoplist(self):
         """ Метод возвращает queryset из ингридиентов и количества"""
-        # basked_items = self.filter(user=self.instance)
+        basked_items = self.filter(user=self.instance)
         basked_recipes = self.all().values('recipe_id')
         ingredients = IngredientsInRecipe.objects.filter(
             recipe__in=basked_recipes).values(
@@ -345,12 +346,16 @@ class BasketManager(models.Manager):
             total=models.Sum('amount'))
 
         shoplist = 'Ваш список покупок от сервиса про`Еда\n\n'
+        shoplist += 'Для приготовления выбранных вами продуктов:\n'
+        for num, item in enumerate(basked_items, 1):
+            shoplist += '\t' + str(num) + '. '
+            shoplist += '\t' + item + '\n'
+        shoplist += '\nВам понадобятся:\n'
         for num, item in enumerate(ingredients, 1):
             shoplist += '\t' + str(num) + '. '
             shoplist += item['ingredient__name'] + ': '
             shoplist += str(item['total']) + ' '
             shoplist += item['ingredient__unit__name'] + '\t\t[  ]' + '\n'
-
         shoplist += '\n\tПриятного аппетита!'
         shoplist += '\n\thttp://proeda.lukojo.com'
         return shoplist

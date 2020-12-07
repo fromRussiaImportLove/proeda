@@ -1,11 +1,9 @@
 <!doctype html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}Заголовок страницы{% endblock %} | проéда</title>
-    <!-- Загрузка статики -->
     {% load static %}
     <link rel="shortcut icon" type="image/svg" href="{% static "recipes/images/hamburger.svg" %}">
     <link rel="stylesheet" href="{% static 'recipes/pages/logo.css' %}">
@@ -24,5 +22,4 @@
     {% include 'footer.html' %}
     {% block include_js %}{% endblock %}
 </body>
-
 </html>

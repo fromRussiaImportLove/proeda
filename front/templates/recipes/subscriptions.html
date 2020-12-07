@@ -5,31 +5,25 @@
     <link rel="stylesheet" href="{% static 'recipes/pages/myFollow.css' %}">
 {% endblock %}
 {% block content %}
-
-    <div class="main__header">
-            <h1 class="main__title">Мои подписки</h1>
-        </div>
-        <div class="card-list">
-            {% for author in page %}
-                {% include "recipes/subscriptions_card.html" with author=author %}
-            {% endfor %}
-        </div>
-
-        {% if page.has_other_pages %}
-        {% include "paginator.html" with items=page paginator=paginator %}
-        {% endif %}
-
+<div class="main__header">
+    <h1 class="main__title">Мои подписки</h1>
+</div>
+<div class="card-list">
+    {% for author in page %}
+        {% include "recipes/subscriptions_card.html" with author=author %}
+    {% endfor %}
+</div>
+{% if page.has_other_pages %}
+    {% include "paginator.html" with items=page paginator=paginator %}
+{% endif %}
 {% endblock %}
+
 {% block include_js %}
-    {% csrf_token %}
-<script src="{% static 'recipes/js/config/config.js' %}"></script>
+{% csrf_token %}
 <script src="{% static 'recipes/js/components/MainCards.js' %}"></script>
 <script src="{% static 'recipes/js/components/MyFollow.js' %}"></script>
 <script src="{% static 'recipes/js/components/Subscribe.js' %}"></script>
-<script src="{% static 'recipes/js/components/Header.js' %}"></script>
-<script src="{% static 'recipes/js/api/Api.js' %}"></script>
 {% if user.is_authenticated %}
-<script src="{% static 'recipes/myFollow.js' %}"></script>
-{% else %}
+    <script src="{% static 'recipes/js/pages/myFollow.js' %}"></script>
 {% endif %}
 {% endblock %}

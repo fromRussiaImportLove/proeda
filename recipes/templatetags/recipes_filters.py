@@ -1,5 +1,9 @@
 from django import template
-from recipes.models import Basket, Favorite, Follow
+from random import choice
+
+from django.urls import reverse
+
+from recipes.models import Basket, Favorite, Follow, Recipe
 
 register = template.Library()
 
@@ -22,3 +26,11 @@ def is_follow(user, author):
 @register.filter
 def checked(arg):
     return 'checked' if arg else None
+
+
+@register.filter
+def random_recipe():
+    url = reverse('recipe')
+    recipe_id = choice(Recipe.objects.values('id'))['id']
+    recipe = Recipe.objects.get(id=recipe_id)
+    return url + recipe_id + recipe.slug

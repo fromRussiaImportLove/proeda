@@ -1,14 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
+{% load users_filters %}
 {% block title %}Регистрация{% endblock %}
 {% block head_style %}
     <link rel="stylesheet" href="{% static 'recipes/pages/form.css' %}">
 {% endblock %}
 {% block content %}
-{% load users_filters %}
-
 <div class="main__header">
-        <h1 class="main__title">Регистрация</h1>
+    <h1 class="main__title">Регистрация</h1>
 </div>
 
 <div class="form-container">
@@ -21,7 +20,7 @@
                 <div class="form__field-group">
                     {{ field|addclass:"form__input" }}
                     {% if form.errors %}
-                    <span class="form__error">{{ form.errors }}</span>
+                        <span class="form__error">{{ form.errors }}</span>
                         {% if field.help_text %}
                             <span class="form__input-info">{{ field.help_text|safe }}</span>
                         {% endif %}
@@ -34,5 +33,4 @@
             </div>
     </form>
 </div>
-
 {% endblock %}

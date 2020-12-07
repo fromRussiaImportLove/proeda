@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}500 error{% endblock %}
+{% block content %}
+    <div class="main__header">
+        <h1 class="main__title">Что-то пошло не так</h1>
+    </div>
+    <div class="custom-center-block">
+            <p class="custom-text-block">Попробуйте перезагрузить страницу или попробовать позже</p>
+        <div class="custom-button-block">
+            <a href="{% url 'index' %}" class="button button_style_blue">Пойти на главную</a>
+        </div>
+    </div>
+{% endblock %}
