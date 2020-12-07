@@ -1,6 +1,8 @@
 <div class="card-user" data-author="{{ author.id }}">
         <div class="card-user__header">
+            <a href="{% url 'profile' author.username %}">
             <h2 class="card-user__title">{{ author.fullname }}</h2>
+            </a>
         </div>
         <div class="card-user__body">
             <ul class="card-user__items">
@@ -8,7 +10,8 @@
                 <li class="card-user__item">
                     <div class="recipe">
                         <img src="{{ recipe.image_small_size.url }}" alt="{{ recipe.name }}" class="recipe__image">
-                        <h3 class="recipe__title">{{ recipe.name }}</h3>
+                        <a href="{% url 'recipe' recipe.id recipe.slug %}">
+                        <h3 class="recipe__title">{{ recipe.name }}</h3></a>
                         <p class="recipe__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
                     </div>
                 </li>

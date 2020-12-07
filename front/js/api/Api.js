@@ -120,15 +120,16 @@ class Api {
         })
   }
     getIngredients  (text)  {
-        return fetch(`${this.apiUrl}/ingredients?query=${text}`, {
+        return fetch(`${this.apiUrl}/ingredients/?format=json&query=${text}`, {
             headers: {
                 'Content-Type': 'application/json',
-                        'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
-
+                // 'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
             }
         })
             .then( e => {
+
                 if(e.ok) {
+
                     return e.json()
                 }
                 return Promise.reject(e.statusText)

@@ -76,12 +76,11 @@ class Recipe(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f'{self.pk}-{self.name}')
+            self.slug = slugify(f'{self.name}')
         return super().save(*args, **kwargs)
 
-    # def clean(self):
-    #     if not TagRecipe.objects.filter(recipe=self).exists():
-    #         raise ValidationError('Tag has not been added')
+    def update_slug(self):
+        self.slug = slugify(f'{self.name}')
 
 
 class IngredientsInRecipe(models.Model):
@@ -122,10 +121,14 @@ class TagRecipe(models.Model):
             raise ValidationError('At least one tag must True')
 
     @classmethod
-    def validate_tag(cls, tag):
+    def tag_list(cls):
         tags = (field.name for field in cls._meta._get_fields()
                 if field.name not in ('id', 'recipe'))
-        return tag in tags
+        return tuple(tags)
+
+    @classmethod
+    def validate_tag(cls, tag):
+        return tag in cls.tag_list()
 
     def true_list(self):
         tags = [field for field, value in self.__dict__.items()
@@ -242,7 +245,7 @@ class FavoriteManager(models.Manager):
         добавленные в избранное
         """
         recipes = [r.recipe.id for r in self.instance.favorite_recipes.all()]
-        queryset = Recipe.objects.filter(id__in=recipes)
+        queryset = Recipe.objects.filter(id__in=recipes).order_by('-pub_date')
         return queryset
 
     def append(self, recipe):
@@ -306,7 +309,7 @@ class BasketManager(models.Manager):
         добавленных в корзину
         """
         recipes = [r.recipe.id for r in self.instance.basket.all()]
-        queryset = Recipe.objects.filter(id__in=recipes)
+        queryset = Recipe.objects.filter(id__in=recipes).order_by('name')
         return queryset
 
     def append(self, recipe):

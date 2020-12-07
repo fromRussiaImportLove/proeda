@@ -39,7 +39,10 @@
                         <li class="single-card__item"><p class="single-card__text"><span class="icon-user"></span>
                             <a href="{% url 'profile' recipe.author.username %}" style="color: black">{{ recipe.author.fullname }}</a>
                         </p></li>
-                        <li class="single-card__item">  <a style="margin-left: 2.5em" href="#" class="single-card__text">Редактировать рецепт</a></li>
+                        {% if user == recipe.author or user.is_staff %}
+                        <li class="single-card__item">  <a style="margin-left: 2.5em" href="{% url 'edit_recipe' recipe.id recipe.slug %}" class="single-card__text">Редактировать рецепт</a></li>
+                        <li class="single-card__item">  <a style="margin-left: 2.5em" href="{% url 'del_recipe' recipe.id recipe.slug %}" class="single-card__text">Удалить рецепт</a></li>
+                        {% endif %}
                     </ul>
                 </div>
                 <ul class="single-card__items">
@@ -53,6 +56,12 @@
                     {% if user|is_follow:recipe.author %}
                     <li class="single-card__item">
                         <button class="button button_style_light-blue button_size_subscribe" name="subscribe">Отписаться</button>
+                    </li>
+                    {% elif user == recipe.author %}
+                    <li class="single-card__item">
+                        <button class="button button_style_blue button_size_subscribe">
+                            Это Вы!
+                        </button>
                     </li>
                     {% else %}
                     <li class="single-card__item">

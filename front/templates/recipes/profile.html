@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load recipes_filters %}
 {% block title %}Рецепты{% endblock %}
 {% block content %}
 
@@ -9,7 +10,26 @@
 
     </div>
     <div class="author-subscribe" data-author="{{ author.id }}">
-            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></p>
+            <p style="padding: 0 0 2em 0;">
+                {% if user|is_follow:author %}
+                <button class="button button_style_light-blue button_size_subscribe" name="subscribe">
+                    Отписаться от автора
+                </button>
+                {% elif user == author %}
+                <button class="button button_style_blue button_size_subscribe">
+                    Это Вы!
+                </button>
+                {% else %}
+                <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
+                    Подписаться на автора
+                </button>
+                {% endif %}
+                {% if user.is_staff %}
+                    <button class="button button_style_blue button_size_subscribe">
+                        Забанить пользователя
+                    </button>
+                {% endif %}
+            </p>
     </div>
     <div class="card-list">
             {% for recipe in page %}
@@ -39,6 +59,6 @@
 {% else %}
 
 {% endif %}
-<script src="{% static 'recipes/js/components/Subscribe.js' %}"></script>
-<script src="{% static 'recipes/AuthorRecipe.js' %}"></script>
+<script src="{% static 'recipes/js/components/AuthorRecipe.js' %}"></script>
+<script src="{% static 'recipes/authorRecipe.js' %}"></script>
 {% endblock %}

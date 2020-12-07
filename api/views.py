@@ -2,37 +2,22 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from django.contrib.auth import get_user_model
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 # from api.permissions import IsOwnerOrReadOnly
 from api.serializers import *
-from recipes.models import Recipe
+from recipes.models import Recipe, Ingredient
 
 
 User = get_user_model()
 
 
-# class BasketViewSet(viewsets.ModelViewSet):
-#     # permission_classes = [IsAuthenticated]
-#
-#     queryset = Basket.objects.all()
-#     serializer_class = BaksetSerializer
-#
-#     def perform_create(self, serializer):
-#         serializer.save(user=self.request.user)
-#
-#
-# class CommentViewSet(viewsets.ModelViewSet):
-#     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
-#     serializer_class = CommentSerializer
-#
-#     def get_queryset(self):
-#         post = get_object_or_404(Post, id=self.kwargs['post_id'])
-#         return post.comments.all()
-#
-#     def perform_create(self, serializer):
-#         serializer.save(author=self.request.user)
+class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser, ]
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 @api_view(['GET', 'POST', 'DELETE'])
@@ -120,3 +105,22 @@ def api_follow(request, author_id=None):
         author = get_object_or_404(User, pk=author_id)
         user.favorite_authors.remove(author)
         return Response('ok', status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, ])
+def api_ingredients(request, query=None):
+    if request.method == 'GET':
+        if query := request.GET.get('query'):
+            if len(query) > 2:
+                ingredients = Ingredient.objects.filter(name__icontains=query)
+            else:
+                return Response(
+                    'too short query, need 3 symbol minimum',
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            ingredients = Ingredient.objects.all()
+        serializer = IngredientSerializer(ingredients, many=True)
+        return Response(serializer.data)
+

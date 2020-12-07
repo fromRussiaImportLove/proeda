@@ -21,8 +21,10 @@ MEDIA_URL = env.str('MEDIA_URL', default='/media/')
 STATIC_ROOT = root('static')
 STATIC_URL = env.str('STATIC_URL', default='/static/')
 #STATICFILES_DIRS = env.list(str(env.tuple('STATICFILES_DIRS')), default=[])
-STATICFILES_DIRS = [('recipes', './front/'),]
+#STATICFILES_DIRS = [('recipes', './front/'),]
+STATICFILES_DIRS = [('recipes', './static/recipes'),]
 TEMPLATES_DIR = root('front/templates')
+#TEMPLATES_DIR = root('static/recipes/templates')
 
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = 'index'
