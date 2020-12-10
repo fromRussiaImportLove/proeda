@@ -21,6 +21,22 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 
+class BasketViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = BaksetSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        recipes = user.basket.all()
+        # post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
+        return recipes
+
+    def perform_create(self, serializer):
+        # user = self.request.user
+        recipe = get_object_or_404(Recipe, id=self.kwargs.get('recipe'))
+        serializer.save(user=self.request.user, recipe=recipe)
+
+
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes([IsAuthenticated, ])
 def api_basket(request, recipe_id=None):
@@ -41,13 +57,13 @@ def api_basket(request, recipe_id=None):
         recipe_id = request.data.get('recipe')
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         user.basket.append(recipe)
-        return Response('ok', status=status.HTTP_200_OK)
+        return Response({'success': True}, status=status.HTTP_200_OK)
 
     elif request.method == 'DELETE':
         user = request.user
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         user.basket.remove(recipe)
-        return Response('ok', status=status.HTTP_200_OK)
+        return Response({'success': True}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET', 'POST', 'DELETE'])
@@ -71,13 +87,13 @@ def api_favorites(request, recipe_id=None):
         recipe_id = request.data.get('recipe')
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         user.favorite_recipes.append(recipe)
-        return Response('ok', status=status.HTTP_200_OK)
+        return Response({'success': True}, status=status.HTTP_200_OK)
 
     elif request.method == 'DELETE':
         user = request.user
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         user.favorite_recipes.remove(recipe)
-        return Response('ok', status=status.HTTP_200_OK)
+        return Response({'success': True}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET', 'POST', 'DELETE'])
@@ -101,27 +117,30 @@ def api_follow(request, author_id=None):
         author_id = request.data.get('author_id')
         author = get_object_or_404(User, pk=author_id)
         user.favorite_authors.append(author)
-        return Response('ok', status=status.HTTP_200_OK)
+        return Response({'success': True}, status=status.HTTP_200_OK)
 
     elif request.method == 'DELETE':
         user = request.user
         author = get_object_or_404(User, pk=author_id)
         user.favorite_authors.remove(author)
-        return Response('ok', status=status.HTTP_200_OK)
+        return Response({'success': True}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, ])
 def api_ingredients(request):
     if request.method == 'GET':
-        if query := request.GET.get('query'):
-            if len(query) > 2:
-                ingredients = Ingredient.objects.filter(name__icontains=query)
-            else:
-                return Response(
-                    'too short query, need 3 symbol minimum',
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+        query = request.GET.get('query')
+        if query and len(query) > 2:
+            ingredients = Ingredient.objects.filter(name__icontains=query)
+        elif query:
+            return Response(
+                {
+                'success': False,
+                'detail': 'too short query, need 3 symbol minimum',
+                },
+                exception=status.HTTP_400_BAD_REQUEST
+            )
         else:
             ingredients = Ingredient.objects.all()
         serializer = IngredientSerializer(ingredients, many=True)

@@ -11,6 +11,7 @@ SITE_ROOT = root()
 
 DEBUG = env.bool('DEBUG', default=False)
 FLATPAGES = env.bool('FLATPAGES', default=False)
+WHITENOISE = env.bool('WHITENOISE', default=False)
 ALLOWED_HOSTS = ['*']
 SECRET_KEY = env.str('SECRET_KEY')
 JWT_ENABLE = env.bool('JWT_ENABLE', default=False)
@@ -20,8 +21,8 @@ MEDIA_ROOT = root('media')
 MEDIA_URL = env.str('MEDIA_URL', default='/media/')
 STATIC_ROOT = root('static')
 STATIC_URL = env.str('STATIC_URL', default='/static/')
-STATICFILES_DIRS = [('recipes', './static/recipes'), ]
-TEMPLATES_DIR = root('front/templates')
+# STATICFILES_DIRS = [('recipes', './recipes/static'), ]
+TEMPLATES_DIR = root('templates')
 
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = 'index'
@@ -98,7 +99,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-    ]
+    ],
+    'EXCEPTION_HANDLER': 'api.utils.custom_exception_handler',
 }
 
 if JWT_ENABLE:
@@ -116,8 +118,14 @@ if DEBUG:
     CACHES = {'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
     EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
     EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+    if WHITENOISE:
+        INSTALLED_APPS.insert(0, 'whitenoise.runserver_nostatic')
 
 if FLATPAGES:
     INSTALLED_APPS.append('django.contrib.sites')
     INSTALLED_APPS.append('django.contrib.flatpages')
     SITE_ID = 1
+
+if WHITENOISE:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'

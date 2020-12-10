@@ -12,7 +12,6 @@ from recipes.utils import (
     tag_handler_paginator)
 
 User = get_user_model()
-TAG_LIST = TagRecipe.tag_list()
 
 
 def index(request):
@@ -34,7 +33,6 @@ def favorites(request):
     user = request.user
     query = user.favorite_recipes.get_my_recipes()
     context = tag_handler_paginator(request, query)
-    context['favpage'] = True
     return render(request, 'recipes/index.html', context)
 
 
@@ -48,9 +46,10 @@ def add_recipe(request):
     """
 
     form = RecipeForm(request.POST or None, files=request.FILES or None)
+    tag_list = TagRecipe.tag_list()
 
     if request.method == 'POST':
-        tags = {tag: tag in form.data for tag in TAG_LIST}
+        tags = {tag: tag in form.data for tag in tag_list}
         ingrs_and_amount = parse_ingredients_from_form(form.data)
         if form.is_valid() and any(tags.values()) and ingrs_and_amount:
             recipe = form.save(commit=False)
@@ -82,6 +81,7 @@ def edit_recipe(request, recipe_id=None, the_slug=None):
     if not (user.is_staff or user == recipe.author):
         return HttpResponseForbidden
 
+    tag_list = TagRecipe.tag_list()
     form = RecipeForm(
         request.POST or None,
         files=request.FILES or None,
@@ -90,7 +90,7 @@ def edit_recipe(request, recipe_id=None, the_slug=None):
     instance_ingredients = recipe.ingredients.all()
 
     if request.method == 'POST':
-        tags = {tag: tag in form.data for tag in TAG_LIST}
+        tags = {tag: tag in form.data for tag in tag_list}
         ingrs_and_amount = parse_ingredients_from_form(form.data)
 
         if form.is_valid() and any(tags.values()) and ingrs_and_amount:
@@ -129,7 +129,7 @@ def del_recipe(request, recipe_id=None, the_slug=None):
 def subscriptions(request):
     user = request.user
     authors = user.favorite_authors.get_my_authors()
-    context = get_paginator_context(authors, 3, request)
+    context = get_paginator_context(request, authors, 3)
     return render(request, 'recipes/subscriptions.html', context)
 
 

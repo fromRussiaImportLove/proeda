@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 from imagekit.models import ImageSpecField
 from imagekit.processors import Adjust, ResizeToFill
 from pytils.translit import slugify
@@ -24,7 +25,7 @@ class Ingredient(models.Model):
 
 
 class RecipeManager(models.Manager):
-    def get_three(self):
+    def get_three_last(self):
         return self.order_by('-pub_date')[:3]
 
 
@@ -79,6 +80,9 @@ class Recipe(models.Model):
         if not self.slug:
             self.slug = slugify(f'{self.name}')
         return super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('recipe', args=(self.id, self.slug))
 
     def update_slug(self):
         self.slug = slugify(f'{self.name}')
@@ -245,7 +249,7 @@ class FavoriteManager(models.Manager):
         :return: Возвращает список рецептов пользователя,
         добавленные в избранное
         """
-        recipes = [r.recipe.id for r in self.instance.favorite_recipes.all()]
+        recipes = self.instance.favorite_recipes.values('recipe_id')
         queryset = Recipe.objects.filter(id__in=recipes).order_by('-pub_date')
         return queryset
 
@@ -299,7 +303,7 @@ class Favorite(models.Model):
 
 
 class BasketManager(models.Manager):
-    def is_basked(self, recipe, user):
+    def is_in_basket(self, recipe, user):
         if user.is_authenticated:
             return super().filter(recipe=recipe, user=user).exists()
         return False

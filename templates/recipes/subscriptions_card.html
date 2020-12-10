@@ -6,7 +6,7 @@
     </div>
     <div class="card-user__body">
         <ul class="card-user__items">
-            {% for recipe in author.recipes.get_three %}
+            {% for recipe in author.recipes.get_three_last %}
                 <li class="card-user__item">
                     <div class="recipe">
                         <img src="{{ recipe.image_small_size.url }}" alt="{{ recipe.name }}" class="recipe__image">

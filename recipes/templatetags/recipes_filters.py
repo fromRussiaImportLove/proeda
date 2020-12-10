@@ -9,8 +9,8 @@ register = template.Library()
 
 
 @register.filter
-def is_basked(user, recipe):
-    return Basket.objects.is_basked(recipe, user)
+def is_in_basket(user, recipe):
+    return Basket.objects.is_in_basket(recipe, user)
 
 
 @register.filter
@@ -28,9 +28,8 @@ def checked(arg):
     return 'checked' if arg else None
 
 
-@register.filter
-def random_recipe():
-    url = reverse('recipe')
+@register.simple_tag
+def random_recipe_url():
     recipe_id = choice(Recipe.objects.values('id'))['id']
     recipe = Recipe.objects.get(id=recipe_id)
-    return url + recipe_id + recipe.slug
+    return recipe.get_absolute_url()
