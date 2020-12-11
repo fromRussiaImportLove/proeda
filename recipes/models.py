@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from imagekit.models import ImageSpecField
@@ -7,7 +6,6 @@ from imagekit.processors import Adjust, ResizeToFill
 from pytils.translit import slugify
 
 from taggit.managers import TaggableManager, _TaggableManager
-from taggit.models import CommonGenericTaggedItemBase, TaggedItemBase
 
 User = get_user_model()
 

@@ -1,8 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
-from recipes.models import Ingredient, Unit
 import csv
 import os
+
+from django.conf import settings
+from django.core.management.base import BaseCommand
+
+from recipes.models import Ingredient, Unit
 
 
 class Command(BaseCommand):
@@ -25,5 +27,4 @@ class Command(BaseCommand):
                     )
 
             self.stdout.write(self.style.SUCCESS(
-                    f'Import ingredients finished'))
-
+                    'Import ingredients finished'))

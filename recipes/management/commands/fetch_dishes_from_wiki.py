@@ -63,20 +63,20 @@ class Command(BaseCommand):
                             with open(imagepath, "wb") as f:
                                 r.raw.decode_content = True
                                 f.write(r.raw.read())
-                        self.stdout.write(f'download image', ending='\t')
+                        self.stdout.write('download image', ending='\t')
                     else:
-                        self.stdout.write(f'image download already, skip it',
-                              ending='\t')
+                        self.stdout.write('image download already, skip it',
+                                          ending='\t')
                     if not os.path.exists(thumb_image_path):
                         im = Image.open(imagepath)
                         im.thumbnail(IMAGE_SIZE)
                         im.save(thumb_image_path, 'JPEG', quality=90)
-                        self.stdout.write(f'thumbed it', ending='\t')
+                        self.stdout.write('thumbed it', ending='\t')
                     else:
-                        self.stdout.write(f'image thumbed already, skip it',
+                        self.stdout.write('image thumbed already, skip it',
                                           ending='\t')
                     spamwriter.writerow(line)
-                    self.stdout.write(f'write to csv')
+                    self.stdout.write('write to csv')
                 except Exception as e:
                     self.stdout.write(f'{e} on dish {line[0]}')
             self.stdout.write('job is done')
