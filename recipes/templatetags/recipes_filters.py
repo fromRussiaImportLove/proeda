@@ -1,7 +1,6 @@
-from django import template
 from random import choice
 
-from django.urls import reverse
+from django import template
 
 from recipes.models import Basket, Favorite, Follow, Recipe
 

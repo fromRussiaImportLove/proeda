@@ -6,10 +6,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.detail import DetailView
 
 from recipes.forms import RecipeForm
-from recipes.models import IngredientsInRecipe, Recipe, TagRecipe
+from recipes.models import IngredientsInRecipe, Recipe
 from recipes.utils import (
     get_paginator_context, parse_ingredients_from_form,
-    tag_handler_paginator)
+    print_shoplist, tag_handler_paginator)
 
 User = get_user_model()
 
@@ -46,23 +46,23 @@ def add_recipe(request):
     """
 
     form = RecipeForm(request.POST or None, files=request.FILES or None)
-    tag_list = TagRecipe.tag_list()
+    tag_list = ('breakfast', 'lunch', 'dinner')
 
     if request.method == 'POST':
-        tags = {tag: tag in form.data for tag in tag_list}
+        tags = [tag for tag in tag_list if tag in form.data]
         ingrs_and_amount = parse_ingredients_from_form(form.data)
-        if form.is_valid() and any(tags.values()) and ingrs_and_amount:
+        if form.is_valid() and tags and ingrs_and_amount:
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
-            TagRecipe.objects.create(recipe=recipe, **tags)
+            recipe.tags.add(*tags)
             for ingr in ingrs_and_amount:
                 IngredientsInRecipe.objects.create(recipe=recipe, **ingr)
 
             return redirect('recipe', recipe.id, recipe.slug)
 
-    context = {'recipe_form': form}
-    return render(request, 'recipes/recipe_new.html', context)
+    context = {'form': form}
+    return render(request, 'recipes/recipe_form.html', context)
 
 
 @login_required
@@ -81,7 +81,7 @@ def edit_recipe(request, recipe_id=None, the_slug=None):
     if not (user.is_staff or user == recipe.author):
         return HttpResponseForbidden
 
-    tag_list = TagRecipe.tag_list()
+    tag_list = ('breakfast', 'lunch', 'dinner')
     form = RecipeForm(
         request.POST or None,
         files=request.FILES or None,
@@ -90,15 +90,15 @@ def edit_recipe(request, recipe_id=None, the_slug=None):
     instance_ingredients = recipe.ingredients.all()
 
     if request.method == 'POST':
-        tags = {tag: tag in form.data for tag in tag_list}
+        tags = [tag for tag in tag_list if tag in form.data]
         ingrs_and_amount = parse_ingredients_from_form(form.data)
 
         if form.is_valid() and any(tags.values()) and ingrs_and_amount:
             recipe = form.save(commit=False)
             recipe.update_slug()
             recipe.save()
-            tags_in_instance = TagRecipe.objects.filter(recipe=recipe)
-            tags_in_instance.update(recipe=recipe, **tags)
+            recipe.tags.clear()
+            recipe.tags.add(*tags)
             for ingr in instance_ingredients:
                 ingr.delete()
             for ingr in ingrs_and_amount:
@@ -107,11 +107,11 @@ def edit_recipe(request, recipe_id=None, the_slug=None):
             return redirect('recipe', recipe.id, recipe.slug)
 
     context = {
-        'recipe_form': form,
+        'form': form,
         'recipe': recipe,
         'ingredients': instance_ingredients
     }
-    return render(request, 'recipes/recipe_edit.html', context)
+    return render(request, 'recipes/recipe_form.html', context)
 
 
 @login_required
@@ -143,7 +143,7 @@ def basket(request):
 @login_required()
 def basket_download(request):
     user = request.user
-    shoplist = user.basket.shoplist()
+    shoplist = print_shoplist(user.basket.get_data_for_shoplist())
     return HttpResponse(shoplist, content_type='text/plain; charset=utf8')
 
 

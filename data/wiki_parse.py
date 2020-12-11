@@ -7,10 +7,11 @@ from PIL import Image
 
 IMAGE_SIZE = 480, 480
 
+
 def down_wiki_data():
     wikipedia.set_lang('ru')
     category = 'Категория:Блюда по алфавиту'
-    dishes_name = wikipedia.search('Блюда_по_алфавиту', results=100)
+    dishes_name = wikipedia.search('Блюда_по_алфавиту', results=2)
     print('hello')
     for n, dish in enumerate(dishes_name, 1):
         wdish = wikipedia.page(dish)
@@ -32,6 +33,8 @@ def csv_make():
     if not os.path.exists(filepath):
         file = open(filepath, 'w')
         file.close()
+    #if not os.path.isdir('wiki'):
+    os.makedirs('wiki/thumb', exist_ok=False)
 
     with open(filepath, 'a', newline='', ) as csvfile:
         spamwriter = csv.writer(csvfile, delimiter='\t')
@@ -40,17 +43,26 @@ def csv_make():
             url = line[2]
             imagename = f'{slugify(line[0])}.jpg'
             imagepath = f'wiki/{imagename}'
+            thumb_image_path = f'wiki/thumb/{slugify(line[0])}.jpg'
             line[2] = imagepath
             try:
                 if not os.path.exists(imagepath):
-                    image_full = requests.get(url, stream=True).raw
+                    # image_full = requests.get(url, stream=True).raw
+                    with requests.get(url, stream=True) as r:
+                        with open(imagepath, "wb") as f:
+                            r.raw.decode_content = True
+                            # shutil.copyfileobj(r.raw, f)
+                            f.write(r.raw.read())
                     print(f'download image', end='\t')
-                    im = Image.open(image_full)
-                    im.thumbnail(IMAGE_SIZE)
-                    im.save(imagepath, 'JPEG', quality=90)
-                    print(f'save it', end='\t')
                 else:
                     print(f'image download already, skip process', end='\t')
+                if not os.path.exists(thumb_image_path):
+                    im = Image.open(imagepath)
+                    im.thumbnail(IMAGE_SIZE)
+                    im.save(thumb_image_path, 'JPEG', quality=90)
+                    print(f'thumbed it', end='\t')
+                else:
+                    print(f'image thumbed already, skip process', end='\t')
                 spamwriter.writerow(line)
                 print(f'write to csv')
             except Exception as e:

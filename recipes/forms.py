@@ -8,7 +8,7 @@ class RecipeForm(ModelForm):
 
     class Meta:
         model = Recipe
-        fields = ('name', 'cooking_time', 'description', 'image')
+        fields = ('name', 'cooking_time', 'description', 'image', )
 
         error_messages = {
             'image': {

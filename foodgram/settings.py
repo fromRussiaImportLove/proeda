@@ -21,7 +21,6 @@ MEDIA_ROOT = root('media')
 MEDIA_URL = env.str('MEDIA_URL', default='/media/')
 STATIC_ROOT = root('static')
 STATIC_URL = env.str('STATIC_URL', default='/static/')
-# STATICFILES_DIRS = [('recipes', './recipes/static'), ]
 TEMPLATES_DIR = root('templates')
 
 LOGIN_URL = '/auth/login/'
@@ -35,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'taggit',
     'rest_framework',
     'corsheaders',
     'django_filters',

@@ -1,15 +1,15 @@
 import csv
-from recipes.models import Recipe, TagRecipe, Ingredient, IngredientsInRecipe
+from recipes.models import Recipe, Ingredient, IngredientsInRecipe
 from users.models import CustomUser
 from random import choice, randint
 
 
-def check_tags(tags):
-    breakfast = bool(1 & tags)
-    lunch = bool(2 & tags)
-    dinner = bool(4 & tags)
+def generator_tags(random_num):
+    breakfast = bool(1 & random_num)*'breakfast'
+    lunch = bool(2 & random_num)*'lunch'
+    dinner = bool(4 & random_num)*'dinner'
 
-    return {'breakfast': breakfast, 'lunch': lunch, 'dinner': dinner}
+    return filter(lambda x: x, [breakfast, lunch, dinner])
 
 
 def import_recipes():
@@ -32,10 +32,8 @@ def import_recipes():
             )
             # generate tags
             tags_generate = randint(1, 7)
-            tags = check_tags(tags_generate)
-            tag, created = TagRecipe.objects.get_or_create(
-                recipe=recipe, **tags
-            )
+            recipe.tags.add(*generator_tags(tags_generate))
+
             # generate ingredient
             num_ingredient = randint(2, 5)
             ingredients_ids = Ingredient.objects.count()

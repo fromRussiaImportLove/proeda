@@ -22,13 +22,13 @@
             </div>
         </div>
         <ul class="single-card__items">
-            {% if 'lunch' in recipe.tags.true_list %}
+            {% if recipe.tags.lunch %}
                 <li class="single-card__item"><span class="badge badge_style_green">Обед</span></li>
             {% endif %}
-            {% if 'breakfast' in recipe.tags.true_list %}
+            {% if recipe.tags.breakfast %}
                 <li class="single-card__item"><span class="badge badge_style_orange">Завтрак</span></li>
             {% endif %}
-            {% if 'dinner' in recipe.tags.true_list %}
+            {% if recipe.tags.dinner %}
                 <li class="single-card__item"><span class="badge badge_style_purple">Ужин</span></li>
             {% endif %}
         </ul>

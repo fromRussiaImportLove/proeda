@@ -6,6 +6,9 @@ from imagekit.models import ImageSpecField
 from imagekit.processors import Adjust, ResizeToFill
 from pytils.translit import slugify
 
+from taggit.managers import TaggableManager, _TaggableManager
+from taggit.models import CommonGenericTaggedItemBase, TaggedItemBase
+
 User = get_user_model()
 
 
@@ -22,6 +25,20 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return f'{self.name}, {self.unit}'
+
+
+class _CustomTaggableManager(_TaggableManager):
+    @property
+    def breakfast(self):
+        return self.instance.tags.filter(name='breakfast').exists()
+
+    @property
+    def lunch(self):
+        return self.instance.tags.filter(name='lunch').exists()
+
+    @property
+    def dinner(self):
+        return self.instance.tags.filter(name='dinner').exists()
 
 
 class RecipeManager(models.Manager):
@@ -69,6 +86,7 @@ class Recipe(models.Model):
     )
 
     objects = RecipeManager()
+    tags = TaggableManager(manager=_CustomTaggableManager)
 
     class Meta:
         ordering = ['-pub_date']
@@ -103,42 +121,6 @@ class IngredientsInRecipe(models.Model):
 
     def __str__(self):
         return f'{self.ingredient.name} - {self.amount} {self.ingredient.unit}'
-
-
-class TagRecipe(models.Model):
-    recipe = models.OneToOneField(
-        Recipe,
-        on_delete=models.CASCADE,
-        related_name='tags',
-    )
-    breakfast = models.BooleanField('Breakfast')
-    lunch = models.BooleanField('Lunch')
-    dinner = models.BooleanField('Dinner')
-
-    def __str__(self):
-        return (f'Tags {self.recipe.name[:15]}: b_{self.breakfast} '
-                f'l_{self.lunch} d_{self.dinner}')
-
-    def clean(self):
-        tags = (value for field, value in self.__dict__.items()
-                if field not in ('id', 'recipe_id', '_state'))
-        if not any(tags):
-            raise ValidationError('At least one tag must True')
-
-    @classmethod
-    def tag_list(cls):
-        tags = (field.name for field in cls._meta._get_fields()
-                if field.name not in ('id', 'recipe'))
-        return tuple(tags)
-
-    @classmethod
-    def validate_tag(cls, tag):
-        return tag in cls.tag_list()
-
-    def true_list(self):
-        tags = [field for field, value in self.__dict__.items()
-                if field not in ('id', 'recipe_id', '_state') and value]
-        return tags
 
 
 class FollowManager(models.Manager):
@@ -340,8 +322,8 @@ class BasketManager(models.Manager):
         basked_items = self.filter(user=user)
         basked_items.delete()
 
-    def shoplist(self):
-        """ Метод возвращает queryset из ингридиентов и количества"""
+    def get_data_for_shoplist(self):
+        """ Метод возвращает два querysetа из ингридиентов и блюд"""
         basked_items = self.filter(user=self.instance)
         basked_recipes = self.all().values('recipe_id')
         ingredients = IngredientsInRecipe.objects.filter(
@@ -349,20 +331,7 @@ class BasketManager(models.Manager):
             'ingredient__name', 'ingredient__unit__name').annotate(
             total=models.Sum('amount'))
 
-        shoplist = 'Ваш список покупок от сервиса про`Еда\n\n'
-        shoplist += 'Для приготовления выбранных вами продуктов:\n'
-        for num, item in enumerate(basked_items, 1):
-            shoplist += '\t' + str(num) + '. '
-            shoplist += '\t' + item + '\n'
-        shoplist += '\nВам понадобятся:\n'
-        for num, item in enumerate(ingredients, 1):
-            shoplist += '\t' + str(num) + '. '
-            shoplist += item['ingredient__name'] + ': '
-            shoplist += str(item['total']) + ' '
-            shoplist += item['ingredient__unit__name'] + '\t\t[  ]' + '\n'
-        shoplist += '\n\tПриятного аппетита!'
-        shoplist += '\n\thttp://proeda.lukojo.com'
-        return shoplist
+        return basked_items, ingredients
 
 
 class Basket(models.Model):
