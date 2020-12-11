@@ -17,6 +17,9 @@ SECRET_KEY = env.str('SECRET_KEY')
 JWT_ENABLE = env.bool('JWT_ENABLE', default=False)
 
 DATABASES = {'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3')}
+EMAIL_CONFIG = env.email_url('EMAIL_URL',
+                             default='smtp://user@:password@localhost:25')
+
 MEDIA_ROOT = root('media')
 MEDIA_URL = env.str('MEDIA_URL', default='/media/')
 STATIC_ROOT = root('static')
