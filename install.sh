@@ -2,9 +2,9 @@
 
 # git clone https://github.com/fromRussiaImportLove/foodgram_project.git
 # cd foodgram_project
-cp .env-example .env
-vim .env
-docker-compose -d up
+# cp .env-example .env
+# vim .env
+# docker-compose up -d
 docker-compose run web python manage.py migrate
 docker-compose run web python manage.py generate_test_users
 docker-compose run web python manage.py generate_ingredients
