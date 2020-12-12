@@ -1,4 +1,4 @@
-![proeda.lukojo.com](http://proeda.lukojo.com/static/recipes/images/dish.svg)
+![proeda.lukojo.com](http://proeda.lukojo.com/static/recipes/images/4git.png)
 
 # proEda / прое́да
 
