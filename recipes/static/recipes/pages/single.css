@@ -27,6 +27,8 @@
 
 
 @import "../blocks/main/main.css";
+@import "../blocks/main/__header/main__header.css";
+@import "../blocks/main/__title/main__title.css";
 
 @import "../blocks/single-card/single-card.css";
 @import "../blocks/single-card/__title/single-card__title.css";
