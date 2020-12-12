@@ -143,7 +143,7 @@ def basket(request):
 @login_required()
 def basket_download(request):
     user = request.user
-    shoplist = print_shoplist(user.basket.get_data_for_shoplist())
+    shoplist = print_shoplist(*user.basket.get_data_for_shoplist())
     return HttpResponse(shoplist, content_type='text/plain; charset=utf8')
 
 

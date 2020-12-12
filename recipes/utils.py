@@ -48,18 +48,15 @@ def parse_ingredients_from_form(form_data):
 
 
 def print_shoplist(basked_items, ingredients):
-    shoplist = 'Ваш список покупок от сервиса про`Еда\n\n'
-    shoplist += 'Для приготовления выбранных вами продуктов:\n'
+    shoplist = (f"{'Ваш список покупок от сервиса про`Еда':^80}"
+                '\n\nДля приготовления выбранных вами блюд:\n')
     for num, item in enumerate(basked_items, 1):
-        shoplist += f'\t {str(num)}. '
-        shoplist += f'\t {item}\n'
-    shoplist += '\nВам понадобятся:\n'
+        shoplist += f'\t {str(num)}. {item}\n'
+    shoplist += '\nВам понадобятся следующие продукты:\n'
     for num, item in enumerate(ingredients, 1):
-        shoplist += f'\t{str(num)}. '
-        shoplist += f'{item["ingredient__name"]} : '
-        shoplist += f'{str(item["total"])} '
-        shoplist += f'{item["ingredient__unit__name"]} \t\t[  ]\n'
-    shoplist += '\n\tПриятного аппетита!'
-    shoplist += '\n\thttp://proeda.lukojo.com'
+        shoplist += (f'\t{str(num)}. '
+                     f'{item["ingredient__name"]:<57}: {str(item["total"]):<4}'
+                     f'{item["ingredient__unit__name"]:<10} \t[  ]\n')
+    shoplist += '\n\tПриятного аппетита!\n\thttp://proeda.lukojo.com'
 
     return shoplist

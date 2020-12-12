@@ -7,8 +7,8 @@
 {% block content %}
 
     <div class="container">
-        <h1>{{ flatpage.title }}</h1>
-        {{ flatpage.content }}
+        <h1 class="main__title">{{ flatpage.title }}</h1>
+        <span class=" single-card__section-text">{{ flatpage.content|linebreaks }}</span>
     </div>
 
 {% endblock %}

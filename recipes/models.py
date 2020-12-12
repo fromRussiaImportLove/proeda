@@ -322,7 +322,7 @@ class BasketManager(models.Manager):
 
     def get_data_for_shoplist(self):
         """ Метод возвращает два querysetа из ингридиентов и блюд"""
-        basked_items = self.filter(user=self.instance)
+        basked_items = self.get_my_recipes()
         basked_recipes = self.all().values('recipe_id')
         ingredients = IngredientsInRecipe.objects.filter(
             recipe__in=basked_recipes).values(

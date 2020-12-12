@@ -1,12 +1,12 @@
-![yamdb_push_workflow](https://github.com/fromRussiaImportLove/yamdb_final/workflows/yamdb_push_workflow/badge.svg)
+![proeda.lukojo.com](http://proeda.lukojo.com/static/recipes/images/dish.svg)
 
 # proEda / прое́да
-
 
 Multi-user service for noting recipes, ingredients and cooking them.
 Users can make bookmark recipe and other author, add recipe to basket 
 where calculate how much of each ingredient need to buy. 
 It's have API for some function, relized by java-script.
+You can test it on http://proeda.lukojo.com
 
 ## Getting Started
 
@@ -60,8 +60,8 @@ For security reason you have edit .env file before build image.
 
 ## Built With
 
-* Django 3.0 [https://www.djangoproject.com/]
-* Django-REST-Framework 3.11 [django-rest-framework.org]
+* Django 3.0 (https://www.djangoproject.com/)
+* Django-REST-Framework 3.11 (http://django-rest-framework.org)
 
 ## Contributing
 
@@ -69,5 +69,5 @@ If you want contribute, do it.
 
 ## Author
 
-Patsy Charmer. My git (there)[https://github.com/fromRussiaImportLove]
+Patsy Charmer. My git [there](https://github.com/fromRussiaImportLove)
  
