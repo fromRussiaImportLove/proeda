@@ -21,22 +21,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 
-class BasketViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, ]
-    serializer_class = BaksetSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        recipes = user.basket.all()
-        # post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
-        return recipes
-
-    def perform_create(self, serializer):
-        # user = self.request.user
-        recipe = get_object_or_404(Recipe, id=self.kwargs.get('recipe'))
-        serializer.save(user=self.request.user, recipe=recipe)
-
-
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes([IsAuthenticated, ])
 def api_basket(request, recipe_id=None):
