@@ -47,10 +47,15 @@ def add_recipe(request):
 
     form = RecipeForm(request.POST or None, files=request.FILES or None)
     tag_list = ('breakfast', 'lunch', 'dinner')
+    context = {'form': form}
 
     if request.method == 'POST':
         tags = [tag for tag in tag_list if tag in form.data]
         ingrs_and_amount = parse_ingredients_from_form(form.data)
+        if not tags:
+            form.add_error(None, 'Нужен хотя бы один тэг')
+        if not ingrs_and_amount:
+            form.add_error(None, 'Нужен хотя бы один ингредиент. Лучше два.')
         if form.is_valid() and tags and ingrs_and_amount:
             recipe = form.save(commit=False)
             recipe.author = request.user
@@ -61,7 +66,8 @@ def add_recipe(request):
 
             return redirect('recipe', recipe.id, recipe.slug)
 
-    context = {'form': form}
+        context['ingredients'] = ingrs_and_amount
+
     return render(request, 'recipes/recipe_form.html', context)
 
 
@@ -92,8 +98,11 @@ def edit_recipe(request, recipe_id=None, the_slug=None):
     if request.method == 'POST':
         tags = [tag for tag in tag_list if tag in form.data]
         ingrs_and_amount = parse_ingredients_from_form(form.data)
-
-        if form.is_valid() and any(tags.values()) and ingrs_and_amount:
+        if not tags:
+            form.add_error(None, 'Нужен хотя бы один тэг')
+        if not ingrs_and_amount:
+            form.add_error(None, 'Нужен хотя бы один ингредиент. Лучше два.')
+        if form.is_valid() and tags and ingrs_and_amount:
             recipe = form.save(commit=False)
             recipe.update_slug()
             recipe.save()

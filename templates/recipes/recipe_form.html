@@ -64,17 +64,15 @@
                     <label for="cantidad" class="form__label" id="cantidadVal">шт.</label>
                 </div>
                 <div class="form__field-group-ingredientes-container">
-                    {% if edit %}
-                        {% for ing in ingredients %}
-                            <div class="form__field-item-ingredient" id="ing_{{ forloop.counter }}">
-                            <span> {{ ing }}</span>
-                            <span class="form__field-item-delete"></span>
-                            <input id="nameIngredient_{{ forloop.counter }}" name="nameIngredient_{{ forloop.counter }}" type="hidden" value="{{ ing.ingredient.name }}">
-                            <input id="valueIngredient_{{ forloop.counter }}" name="valueIngredient_{{ forloop.counter }}" type="hidden" value="{{ ing.amount }}">
-                            <input id="unitsIngredient_{{ forloop.counter }}" name="unitsIngredient_{{ forloop.counter }}" type="hidden" value="{{ ing.ingredient.unit }}">
-                            </div>
+                    {% for ing in ingredients %}
+                        <div class="form__field-item-ingredient" id="ing_{{ forloop.counter }}">
+                        <span> {{ ing }}</span>
+                        <span class="form__field-item-delete"></span>
+                        <input id="nameIngredient_{{ forloop.counter }}" name="nameIngredient_{{ forloop.counter }}" type="hidden" value="{{ ing.ingredient.name }}">
+                        <input id="valueIngredient_{{ forloop.counter }}" name="valueIngredient_{{ forloop.counter }}" type="hidden" value="{{ ing.amount }}">
+                        <input id="unitsIngredient_{{ forloop.counter }}" name="unitsIngredient_{{ forloop.counter }}" type="hidden" value="{{ ing.ingredient.unit }}">
+                        </div>
                     {% endfor %}
-                    {% endif %}
                 </div>
             <span class="form__ingredient-link" id="addIng">Добавить ингредиент</span>
             <span class="form__error"></span>

@@ -17,8 +17,18 @@ SECRET_KEY = env.str('SECRET_KEY')
 JWT_ENABLE = env.bool('JWT_ENABLE', default=False)
 
 DATABASES = {'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3')}
-EMAIL_CONFIG = env.email_url('EMAIL_URL',
-                             default='smtp://user@:password@localhost:25')
+
+EMAIL_BACKEND = env.str('EMAIL_BACKEND',
+                        default='django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = env.str('EMAIL_HOST', default='change@me')
+EMAIL_HOST_USER = env.str('EMAIL_HOST_USER', default='change@me')
+EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD', default='change@me')
+EMAIL_PORT = env.int('EMAIL_PORT', default='change@me')
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=False)
+EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=False)
+DEFAULT_FROM_EMAIL = env.str('DEFAULT_FROM_EMAIL', default='change@me')
+SERVER_EMAIL = env.str('SERVER_EMAIL', default='change@me')
+
 
 MEDIA_ROOT = root('media')
 MEDIA_URL = env.str('MEDIA_URL', default='/media/')
@@ -119,8 +129,8 @@ if DEBUG:
     MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
     INTERNAL_IPS = ["127.0.0.1"]
     CACHES = {'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
-    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-    EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+    # EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    # EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
     if WHITENOISE:
         INSTALLED_APPS.insert(0, 'whitenoise.runserver_nostatic')
 
