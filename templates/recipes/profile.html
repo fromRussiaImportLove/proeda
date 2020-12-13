@@ -19,9 +19,9 @@
                 Это Вы!
             </button>
         {% else %}
-            <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
+            <a class="button button_style_light-blue button_size_subscribe" href="{% url 'login' %}?next=/@{{ author.username }}">
                 Подписаться на автора
-            </button>
+            </a>
         {% endif %}
 
         {% if user.is_staff %}
@@ -46,10 +46,14 @@
 {% csrf_token %}
 <script src="{% static 'recipes/js/components/MainCards.js' %}"></script>
 <script src="{% static 'recipes/js/components/Purchases.js' %}"></script>
+<script src="{% static 'recipes/js/components/AuthorRecipe.js' %}"></script>
 {% if user.is_authenticated %}
     <script src="{% static 'recipes/js/components/Favorites.js' %}"></script>
     <script src="{% static 'recipes/js/components/Subscribe.js' %}"></script>
+    <script src="{% static 'recipes/js/pages/authorRecipe.js' %}"></script>
+{% else %}
+    <script src="{% static 'recipes/js/pages/authorRecipeNotAuth.js' %}"></script>
 {% endif %}
-<script src="{% static 'recipes/js/components/AuthorRecipe.js' %}"></script>
-<script src="{% static 'recipes/js/pages/authorRecipe.js' %}"></script>
+
+
 {% endblock %}

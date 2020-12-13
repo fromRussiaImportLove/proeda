@@ -3,6 +3,7 @@ from django.urls import path
 from recipes import views
 
 urlpatterns = [
+    path('session/', views.session, name='session'),
     path('basket/', views.basket, name='basket'),
     path('basket/download/', views.basket_download, name='basket_download'),
     path('subscriptions/', views.subscriptions, name='subscriptions'),

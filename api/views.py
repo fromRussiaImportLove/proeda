@@ -22,32 +22,58 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['GET', 'POST', 'DELETE'])
-@permission_classes([IsAuthenticated, ])
+# @permission_classes([IsAuthenticated, ])
 def api_basket(request, recipe_id=None):
-    if request.method == 'GET':
-        if recipe_id:
+    if request.user.is_authenticated:
+        if request.method == 'GET':
+            if recipe_id:
+                user = request.user
+                queryset = get_object_or_404(user.basket, recipe__id=recipe_id)
+                serializer = BaksetSerializer(queryset)
+                return Response(serializer.data)
+
             user = request.user
-            queryset = get_object_or_404(user.basket, recipe__id=recipe_id)
-            serializer = BaksetSerializer(queryset)
+            recipes = user.basket.all()
+            serializer = BaksetSerializer(recipes, many=True)
             return Response(serializer.data)
 
-        user = request.user
-        recipes = user.basket.all()
-        serializer = BaksetSerializer(recipes, many=True)
-        return Response(serializer.data)
+        elif request.method == 'POST':
+            user = request.user
+            recipe_id = request.data.get('recipe')
+            recipe = get_object_or_404(Recipe, pk=recipe_id)
+            user.basket.append(recipe)
+            return Response({'success': True}, status=status.HTTP_200_OK)
 
-    elif request.method == 'POST':
-        user = request.user
-        recipe_id = request.data.get('recipe')
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
-        user.basket.append(recipe)
-        return Response({'success': True}, status=status.HTTP_200_OK)
+        elif request.method == 'DELETE':
+            user = request.user
+            recipe = get_object_or_404(Recipe, pk=recipe_id)
+            user.basket.remove(recipe)
+            return Response({'success': True}, status=status.HTTP_200_OK)
+    else:
+        if request.method == 'GET':
+            request.session['foo'] = 'bar'
+            return Response({'session': request.session,
+                             'foo': request.session['foo']})
+        elif request.method == 'POST':
+            recipe_id = request.data.get('recipe')
+            recipe = get_object_or_404(Recipe, pk=recipe_id)
+            request.session.setdefault('basket', [])
+            request.session.setdefault('basket_len', 0)
+            request.session['basket'].append(recipe.id)
+            request.session['basket_len'] = len(request.session['basket'])
+            return Response({'success': True}, status=status.HTTP_200_OK)
 
-    elif request.method == 'DELETE':
-        user = request.user
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
-        user.basket.remove(recipe)
-        return Response({'success': True}, status=status.HTTP_200_OK)
+        elif request.method == 'DELETE':
+            recipe = get_object_or_404(Recipe, pk=recipe_id)
+            request.session.setdefault('basket', [])
+            request.session.setdefault('basket_len', 0)
+            if recipe.id in request.session['basket']:
+                request.session['basket'].remove(recipe.id)
+                request.session['basket_len'] = len(request.session['basket'])
+                return Response({'success': True}, status=status.HTTP_200_OK)
+            else:
+                return Response({'success': False},
+                                status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET', 'POST', 'DELETE'])

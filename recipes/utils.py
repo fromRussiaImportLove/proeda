@@ -2,7 +2,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from taggit.models import Tag
 
-from recipes.models import Ingredient
+from recipes.models import Ingredient, Recipe
 
 
 def get_paginator_context(request, objects_list, page_slice=9) -> dict:
@@ -47,7 +47,7 @@ def parse_ingredients_from_form(form_data):
     return ingredient_from_form
 
 
-def print_shoplist(basked_items, ingredients):
+def print_shoplist(basked_items, ingredients, user=None):
     shoplist = (f"{'Ваш список покупок от сервиса про`Еда':^80}"
                 '\n\nДля приготовления выбранных вами блюд:\n')
     for num, item in enumerate(basked_items, 1):
@@ -57,6 +57,35 @@ def print_shoplist(basked_items, ingredients):
         shoplist += (f'\t{str(num)}. '
                      f'{item["ingredient__name"]:<57}: {str(item["total"]):<4}'
                      f'{item["ingredient__unit__name"]:<10} \t[  ]\n')
-    shoplist += '\n\tПриятного аппетита!\n\thttp://proeda.lukojo.com'
+    if user:
+        shoplist += (f'\n\tПриятного аппетита, {user.username}!'
+                     '\n\thttp://proeda.lukojo.com')
+    else:
+        shoplist += (f'\n\tПриятного аппетита, тайный незнакомец!\n'
+                     '\nНе забудьте зарегистрироваться - тогда здесь не будет ' 
+                     'рекламы,\nа вы сможете добавлять свои рецепты к нам,\n'
+                     'кроме того вам будет доступна подписка на других авторов'
+                     '\nи можно будет формировать избранное из любимых блюд'
+                     '\n\nРЕКЛАМА:'
+                     '\n сайт создан https://github.com/fromRussiaImportLove'
+                     '\n донаты приветствуются!'
+                     '\n\n\n\thttp://proeda.lukojo.com')
 
     return shoplist
+
+
+def validate_session_basket(request, basket_for_session):
+    _list = []
+    for item in basket_for_session:
+        if not isinstance(item, int):
+            request.session['basket'].remove(item)
+            continue
+        try:
+            recipe = Recipe.objects.get(id=int(item))
+            _list.append(recipe)
+        except Recipe.model.DoesNotExist:
+            request.session['basket'].remove(item)
+        except ValueError:
+            request.session['basket'].remove(item)
+
+    return _list

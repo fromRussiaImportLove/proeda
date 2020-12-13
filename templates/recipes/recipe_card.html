@@ -28,7 +28,7 @@
         </div>
     </div>
     <div class="card__footer">
-        {% if user|is_in_basket:recipe %}
+        {% if user|is_in_basket:recipe or recipe.id in request.session.basket %}
             <button class="button button_style_light-blue-outline" name="purchases">
             <span class="icon-check button__icon"></span>Убрать из покупок</button>
         {% else %}

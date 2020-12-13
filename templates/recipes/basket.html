@@ -19,11 +19,16 @@
                 </div>
                 <a href="#" class="shopping-list__button link">Удалить</a>
             </li>
+        {% empty %}
+            <span class=" single-card__section-text">В вашем списке покупок пока еще нет рецептов.<br>
+                Добавьте их и сможете скачать список необходимых покупок</span>
         {% endfor %}
     </ul>
+    {% if recipes %}
     <a href="{% url 'basket_download' %}">
         <button class="button button_style_blue">Скачать список</button>
     </a>
+    {% endif %}
 </div>
 {% endblock %}
 

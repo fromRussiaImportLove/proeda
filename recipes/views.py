@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.db import transaction
+from django.db import models, transaction
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.detail import DetailView
@@ -9,7 +9,7 @@ from recipes.forms import RecipeForm
 from recipes.models import IngredientsInRecipe, Recipe
 from recipes.utils import (
     get_paginator_context, parse_ingredients_from_form,
-    print_shoplist, tag_handler_paginator)
+    print_shoplist, tag_handler_paginator, validate_session_basket)
 
 User = get_user_model()
 
@@ -142,18 +142,39 @@ def subscriptions(request):
     return render(request, 'recipes/subscriptions.html', context)
 
 
-@login_required
 def basket(request):
-    user = request.user
-    recipes_list = user.basket.get_my_recipes()
-    return render(request, 'recipes/basket.html', {'recipes': recipes_list})
+    if request.user.is_authenticated:
+        user = request.user
+        recipes_list = user.basket.get_my_recipes()
+        context = {'recipes': recipes_list}
+        return render(request, 'recipes/basket.html', context)
+
+    basket_for_session = request.session.get('basket')
+    recipes_list = []
+    if basket_for_session:
+        recipes_list = validate_session_basket(request, basket_for_session)
+
+    context = {'recipes': recipes_list}
+    return render(request, 'recipes/basket.html', context)
 
 
-@login_required()
 def basket_download(request):
-    user = request.user
-    shoplist = print_shoplist(*user.basket.get_data_for_shoplist())
-    return HttpResponse(shoplist, content_type='text/plain; charset=utf8')
+    if request.user.is_authenticated:
+        user = request.user
+        shoplist = print_shoplist(*user.basket.get_data_for_shoplist(), user)
+        return HttpResponse(shoplist, content_type='text/plain; charset=utf8')
+
+    basket_for_session = request.session.get('basket')
+    if basket_for_session:
+        recipes_list = validate_session_basket(request, basket_for_session)
+        ingredients = IngredientsInRecipe.objects.filter(
+            recipe__in=recipes_list).values(
+            'ingredient__name', 'ingredient__unit__name').annotate(
+            total=models.Sum('amount'))
+        shoplist = print_shoplist(recipes_list, ingredients)
+        return HttpResponse(shoplist, content_type='text/plain; charset=utf8')
+
+    return HttpResponse('Error request', content_type='text/plain')
 
 
 class RecipeDetailView(DetailView):
@@ -161,3 +182,10 @@ class RecipeDetailView(DetailView):
     template_name = 'recipes/recipe_detail.html'
     slug_url_kwarg = 'recipe_id'
     slug_field = 'pk'
+
+
+def session(request):
+    context = {'session': request.session}
+    print(request)
+    print()
+    return render(request, 'recipes/session.html', context)

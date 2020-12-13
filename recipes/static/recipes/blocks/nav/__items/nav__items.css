@@ -6,3 +6,14 @@
     padding: 0;
     align-items: center;
 }
+
+.nav__items_left {
+    display: flex;
+    height: 100%;
+    flex-direction: row;
+    list-style: none;
+    padding: 0;
+    align-items: flex-start;
+    position: relative;
+    left: -200px;
+}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} {{ flatpage.title }} {% endblock %}
+{% block head_style %}
+    <link rel="stylesheet" href="{% static 'recipes/pages/single.css' %}">
+{% endblock %}
+{% block content %}
+
+    <div class="container">
+        <h1 class="main__title">{{ flatpage.title }}</h1>
+        <span class=" single-card__section-text">{{ session.session_key }}</span>
+        <p>{{ request.session.foo }}</p>
+        <p>{{ session.basket }}</p>
+    </div>
+
+{% endblock %}

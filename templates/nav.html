@@ -4,13 +4,13 @@
     <nav class="nav">
         <div class="nav__container container">
             <ul class="nav__items list"><div class="logo-text">пр<span class="logo"></span>éда</div></ul>
-            <ul class="nav__items list">
+            {% if user.is_authenticated %}<ul class="nav__items list">{% else %}<ul class="nav__items_left list">{% endif %}
                 <li id="index" class="nav__item"><a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
     {% if user.is_authenticated %}
                 <li id="subscriptions" class="nav__item"><a href="{% url 'subscriptions' %}" class="nav__link link">Мои подписки</a></li>
                 <li id="new" class="nav__item"><a href="{% url 'add_recipe' %}" class="nav__link link">Создать рецепт</a></li>
                 <li id="favorites" class="nav__item"><a href="{% url 'favorites' %}" class="nav__link link">Избранное</a></li>
-                <li id="cart" class="nav__item"><a href="{% url 'basket' %}" class="nav__link link">Список покупок</a>
+                <li id="basket" class="nav__item"><a href="{% url 'basket' %}" class="nav__link link">Список покупок</a>
                     <span class="badge badge_style_blue nav__badge" id="counter">{{ user.basket.count }}</span></li>
                 <script src="{% static 'recipes/js/components/Nav.js' %}"></script>
             </ul>
@@ -22,7 +22,10 @@
                         {% endif %}
                 <li class="nav__item"><a href="{% url 'logout' %}" class="nav__link link">Выход</a></li>
     {% else %}
-                </ul>
+                <li id="basket" class="nav__item"><a href="{% url 'basket' %}" class="nav__link link">Список покупок</a>
+                    <span class="badge badge_style_blue nav__badge" id="counter">{{ request.session.basket|length }}</span></li>
+                <script src="{% static 'recipes/js/components/Nav.js' %}"></script>
+            </ul>
             <ul class="nav__items list">
                 <li class="nav__item"><a href="{% url 'login' %}" class="nav__link link">Войти</a></li>
                 <li class="nav__item"><a href="{% url 'signup' %}" class="button button_style_blue">Создать аккаунт</a></li>
