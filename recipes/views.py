@@ -159,11 +159,15 @@ def basket(request):
 
 
 def basket_download(request):
+    filename = 'ShopList.txt'
     if request.user.is_authenticated:
         user = request.user
         shoplist = print_shoplist(*user.basket.get_data_for_shoplist(), user)
-        return HttpResponse(shoplist, content_type='text/plain; charset=utf8')
-
+        response = HttpResponse(shoplist,
+                                content_type='text/plain; charset=utf8')
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(
+            filename)
+        return response
     basket_for_session = request.session.get('basket')
     if basket_for_session:
         recipes_list = validate_session_basket(request, basket_for_session)
@@ -172,8 +176,11 @@ def basket_download(request):
             'ingredient__name', 'ingredient__unit__name').annotate(
             total=models.Sum('amount'))
         shoplist = print_shoplist(recipes_list, ingredients)
-        return HttpResponse(shoplist, content_type='text/plain; charset=utf8')
-
+        response = HttpResponse(shoplist,
+                                content_type='text/plain; charset=utf8')
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(
+            filename)
+        return response
     return HttpResponse('Error request', content_type='text/plain')
 
 

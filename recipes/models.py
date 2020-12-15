@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import PositiveSmallIntegerField
 from django.urls import reverse
 from imagekit.models import ImageSpecField
 from imagekit.processors import Adjust, ResizeToFill
@@ -7,7 +8,21 @@ from pytils.translit import slugify
 
 from taggit.managers import TaggableManager, _TaggableManager
 
+
 User = get_user_model()
+
+
+class NonZeroPositiveSmallIntegerField(PositiveSmallIntegerField):
+    description = "Non zero positive small integer"
+
+    def get_internal_type(self):
+        return "PositiveSmallIntegerField"
+
+    def formfield(self, **kwargs):
+        return super().formfield(**{
+            'min_value': 1,
+            **kwargs,
+        })
 
 
 class Unit(models.Model):
@@ -71,7 +86,8 @@ class Recipe(models.Model):
         format='JPEG',
         options={'quality': 90}
     )
-    cooking_time = models.IntegerField(verbose_name='Время готовки')
+    cooking_time = NonZeroPositiveSmallIntegerField(
+        verbose_name='Время готовки', )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
         auto_now_add=True,
@@ -115,7 +131,7 @@ class IngredientsInRecipe(models.Model):
         on_delete=models.PROTECT,
         related_name='recipes',
     )
-    amount = models.IntegerField(verbose_name='Количество')
+    amount = NonZeroPositiveSmallIntegerField(verbose_name='Количество')
 
     def __str__(self):
         return f'{self.ingredient.name} - {self.amount} {self.ingredient.unit}'

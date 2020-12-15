@@ -7,7 +7,7 @@ nav_location.set("/subscriptions/", "subscriptions");
 nav_location.set("/new/", "new");
 nav_location.set("/favorites/", "favorites");
 nav_location.set("/basket/", "basket");
-
+nav_location.set("/auth/password_change/", "change_pass");
 
 const nav_id = nav_location.get(currentLocation);
 const nav_for_active = document.getElementById(nav_id);

@@ -5,7 +5,7 @@ from taggit.models import Tag
 from recipes.models import Ingredient, Recipe
 
 
-def get_paginator_context(request, objects_list, page_slice=9) -> dict:
+def get_paginator_context(request, objects_list, page_slice=6) -> dict:
     paginator = Paginator(objects_list, page_slice)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -14,14 +14,13 @@ def get_paginator_context(request, objects_list, page_slice=9) -> dict:
 
 
 def tag_handler(request, queryset_without_tag, filter_kwargs=None):
-    if tag := request.GET.get('tag'):
-        tag = get_object_or_404(Tag, name=tag)
+    if tags := request.GET.getlist('tag'):
         if filter_kwargs is None:
             queryset_with_tag = queryset_without_tag.filter(
-                tags__name=tag)
+                tags__name__in=tags).distinct()
         else:
             queryset_with_tag = queryset_without_tag.filter(
-                tags__name=tag, **filter_kwargs)
+                tags__name__in=tags, **filter_kwargs).distinct()
         return queryset_with_tag
     else:
         return queryset_without_tag
@@ -54,7 +53,7 @@ def print_shoplist(basked_items, ingredients, user=None):
         shoplist += f'\t {str(num)}. {item}\n'
     shoplist += '\nВам понадобятся следующие продукты:\n'
     for num, item in enumerate(ingredients, 1):
-        shoplist += (f'\t{str(num)}. '
+        shoplist += (f'\t{str(num):>2}. '
                      f'{item["ingredient__name"]:<57}: {str(item["total"]):<4}'
                      f'{item["ingredient__unit__name"]:<10} \t[  ]\n')
     if user:

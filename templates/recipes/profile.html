@@ -4,7 +4,7 @@
 {% block title %}Рецепты{% endblock %}
 {% block content %}
 
-<div class="main__header">
+<div class="main__header" xmlns="http://www.w3.org/1999/html">
     <h1 class="main__title">{{ author.fullname }}</h1>
     {% include "recipes/tags.html" %}
 </div>
@@ -18,10 +18,14 @@
             <button class="button button_style_blue button_size_subscribe">
                 Это Вы!
             </button>
-        {% else %}
+        {% elif not user.is_authenticated %}
             <a class="button button_style_light-blue button_size_subscribe" href="{% url 'login' %}?next=/@{{ author.username }}">
                 Подписаться на автора
             </a>
+        {% else %}
+            <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
+                Подписаться на автора
+            </button>
         {% endif %}
 
         {% if user.is_staff %}

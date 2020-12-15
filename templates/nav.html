@@ -18,7 +18,7 @@
                         {% if user.is_staff %}
                         <li class="nav__item"><a href="{% url 'admin:index' %}" class="nav__link link">Админ-панель</a></li>
                         {% else %}
-                        <li class="nav__item"><a href="{% url 'password_change' %}" class="nav__link link">Изменить пароль</a></li>
+                        <li id='change_pass' class="nav__item"><a href="{% url 'password_change' %}" class="nav__link link">Изменить пароль</a></li>
                         {% endif %}
                 <li class="nav__item"><a href="{% url 'logout' %}" class="nav__link link">Выход</a></li>
     {% else %}

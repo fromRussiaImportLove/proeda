@@ -32,3 +32,25 @@ def random_recipe_url():
     recipe_id = choice(Recipe.objects.values('id'))['id']
     recipe = Recipe.objects.get(id=recipe_id)
     return recipe.get_absolute_url()
+
+
+
+
+@register.simple_tag(takes_context=True)
+def url_replace(context, **kwargs):
+    query = context['request'].GET.copy()
+    if query.get('tag') and kwargs.get('tag'):
+        if kwargs.get('tag') not in query.getlist('tag'):
+            query.update(kwargs)
+        else:
+            list_ = query.getlist('tag')
+            list_.remove(kwargs.get('tag'))
+            query.setlist('tag', list_)
+        if query.get('page'):
+            query.pop('page')
+    else:
+        query.update(kwargs)
+        if query.get('page'):
+            query['page'] = query['page']
+
+    return query.urlencode()
